@@ -1,0 +1,161 @@
+@import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Nunito:wght@400;600;700;800&family=Quicksand:wght@500;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Quicksand", "Kosugi Maru", "Nunito", ui-sans-serif, system-ui, sans-serif;
+  --font-maru: "Kosugi Maru", sans-serif;
+  --font-quicksand: "Quicksand", sans-serif;
+  --color-primary: #C57B83;
+  --color-primary-light: #FBF0F0;
+  --color-primary-dark: #9E5E65;
+  --color-success: #8FA89B;
+  --color-success-light: #EBF2EE;
+  --color-info-blue: #97B2C4;
+  --color-info-light: #EEF4F8;
+  --color-bg-body: #EAE3D2;
+  --color-bg-card: #FAF8F5;
+  --color-border-hand: #92837B;
+}
+
+:root {
+  --primary: #C57B83;      /* 温柔樱桃粉红 */
+  --primary-light: #FBF0F0;
+  --primary-dark: #9E5E65;
+  --success: #8FA89B;      /* 手绘粉绿 */
+  --success-light: #EBF2EE;
+  --info-blue: #97B2C4;    /* 温柔雾蓝 */
+  --info-light: #EEF4F8;
+  --text-main: #5C524E;    /* 暖咖啡色字体 */
+  --text-muted: #8C807A;
+  --bg-body: #EAE3D2;      /* 经典日系米褐底色 */
+  --bg-card: #FAF8F5;      /* 带有再生纸质感的暖白 */
+  --border-hand: #92837B;  /* 手绘线条咖啡色 */
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+}
+
+body {
+  margin: 0;
+  background-color: #EAE3D2;
+  background-image: linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px);
+  background-size: 20px 100%;
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+}
+
+/* 復古雙層套印陰影 filter */
+.chromatic-aberration {
+  filter: drop-shadow(-1.2px 0px 0px #F5B09E) drop-shadow(1.2px 0px 0px #97B2C4);
+}
+
+/* 立即複習按鈕背景: 雙色手繪愛心 repeated pattern with gold radial effects on warm paper */
+.btn-review-pattern {
+  background-color: #F8F4E8;
+  background-image: 
+    radial-gradient(circle, transparent 72%, #E5A93B 72%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='%23C57B83' opacity='0.08'><path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/></svg>");
+  background-size: 45px 45px, 30px;
+  background-repeat: repeat, repeat;
+  background-position: center, center;
+  color: var(--text-main);
+  font-weight: 900;
+  text-transform: uppercase;
+  /* 多重白色硬描邊 */
+  text-shadow: 
+    -2px -2px 0 #FFF,  
+     2px -2px 0 #FFF,
+    -2px  2px 0 #FFF,
+     2px  2px 0 #FFF,
+    -2px  0px 0 #FFF,
+     2px  0px 0 #FFF,
+     0px   -2px 0 #FFF,
+     0px    2px 0 #FFF;
+}
+
+/* 圖片匯入按鈕背景 (image_57bf2a.png) */
+.btn-import-pattern {
+  background-color: #F5B09E;          /* 粉蜜桃底色 */
+  background-image: 
+    /* 第一層：白色水玉點點 (錯開排布) */
+    radial-gradient(circle, rgba(255, 255, 255, 0.95) 11%, transparent 12%),
+    radial-gradient(circle, rgba(255, 255, 255, 0.95) 11%, transparent 12%),
+    /* 第二層：粉膚色直紋 */
+    linear-gradient(90deg, #FADCD2 0%, #FADCD2 25%, transparent 25%, transparent 75%, #FADCD2 75%, #FADCD2 100%);
+  background-size: 20px 20px, 20px 20px, 40px 100%;
+  background-position: 0 0, 10px 10px, 0 0;
+  color: var(--text-main) !important;
+  text-shadow: 1.5px 1.5px 0px #FFFFFF, -1.5px -1.5px 0px #FFFFFF, 1.5px -1.5px 0px #FFFFFF, -1.5px 1.5px 0px #FFFFFF;
+}
+
+/* 手繪線條紙膠帶紙 classification tag background (image_4dc67e.png) */
+.vocab-category-tag {
+  background-color: #E6DEC9;
+  background-image: linear-gradient(
+    90deg, 
+    #E6DEC9 0%, #E6DEC9 35%, 
+    #EDE9DB 35%, #EDE9DB 70%, 
+    #E6DEC9 70%, #E6DEC9 100%
+  );
+  background-size: 18px 100%;
+}
+
+/* 貼紙風按鈕基本效果 */
+.sticker-btn {
+  border: 2.5px solid var(--border-hand);
+  box-shadow: 3px 3px 0px var(--border-hand);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.sticker-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px var(--border-hand);
+}
+
+/* 圓角自訂格線背景 (用於已掌握與總看板) */
+.grid-mastered {
+  background-color: var(--success-light);
+  background-image: 
+    linear-gradient(#D6E0D9 1px, transparent 1px), 
+    linear-gradient(90deg, #D6E0D9 1px, transparent 1px);
+  background-size: 15px 15px;
+}
+
+.grid-total {
+  background-color: var(--info-light);
+  background-image: 
+    linear-gradient(#D8E2E9 1px, transparent 1px), 
+    linear-gradient(90deg, #D8E2E9 1px, transparent 1px);
+  background-size: 15px 15px;
+}
+
+/* --- 導航欄可愛兔子剪影呼吸微跳躍動畫 --- */
+@keyframes bunny-cute-wiggle {
+  0% {
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+  15% {
+    transform: translateY(-6px) scale(0.85, 1.15) rotate(-5deg);
+  }
+  30% {
+    transform: translateY(1px) scale(1.15, 0.85) rotate(4deg);
+  }
+  45% {
+    transform: translateY(-3px) scale(0.95, 1.05) rotate(-3deg);
+  }
+  60% {
+    transform: translateY(0.5px) scale(1.05, 0.95) rotate(2deg);
+  }
+  75% {
+    transform: translateY(-1px) scale(0.98, 1.02) rotate(-1deg);
+  }
+  100% {
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+.group:hover .bunny-wiggle-svg {
+  animation: bunny-cute-wiggle 1.3s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+

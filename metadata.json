@@ -1,0 +1,10 @@
+{
+  "name": "VocabMaster",
+  "description": "暖心手繪風 Spaced Repetition System (SRS) 萊特納單字自製複習與字庫工具，支援 Tesseract 智慧手寫與 Gemini AI 辨識雙核心 OCR 模組。",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
