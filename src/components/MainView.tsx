@@ -9,6 +9,9 @@ interface MainViewProps {
   onOpenCalendar: () => void;
   onOcrUpload: (imageBase64: string) => void;
   onOpenReader: (initialFilter?: "all" | "learning" | "mastered") => void;
+  customApiKey: string;
+  serverHasApiKey: boolean;
+  onSaveApiKey: (key: string) => void;
 }
 
 export function MainView({
@@ -18,10 +21,23 @@ export function MainView({
   onSwitchView,
   onOpenCalendar,
   onOcrUpload,
-  onOpenReader
+  onOpenReader,
+  customApiKey,
+  serverHasApiKey,
+  onSaveApiKey
 }: MainViewProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  
+  // Local state for API Key management
+  const [apiKeyInput, setApiKeyInput] = useState(customApiKey);
+  const [showKeySettings, setShowKeySettings] = useState(false);
+  const [keyAlertMsg, setKeyAlertMsg] = useState("");
+
+  // Sync state if custom API Key prop changes external source
+  React.useEffect(() => {
+    setApiKeyInput(customApiKey);
+  }, [customApiKey]);
 
   // Compute stats
   const todayStart = new Date();
@@ -43,6 +59,10 @@ export function MainView({
   };
 
   const processImageFile = (file: File) => {
+    if (!serverHasApiKey && !customApiKey.trim()) {
+      setKeyAlertMsg("⚠️ 智慧辨識需要 Gemini API Key，請先於下方輸入金鑰！");
+      return;
+    }
     const reader = new FileReader();
     reader.onload = () => {
       const result = reader.result as string;
@@ -67,6 +87,12 @@ export function MainView({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
+    
+    if (!serverHasApiKey && !customApiKey.trim()) {
+      setKeyAlertMsg("⚠️ 智慧辨識需要 Gemini API Key，請先於下方輸入金鑰！");
+      return;
+    }
+
     const file = e.dataTransfer.files?.[0];
     if (file && file.type.startsWith("image/")) {
       processImageFile(file);
@@ -74,6 +100,10 @@ export function MainView({
   };
 
   const triggerFileInput = () => {
+    if (!serverHasApiKey && !customApiKey.trim()) {
+      setKeyAlertMsg("⚠️ 智慧辨識需要 Gemini API Key，請先於下方輸入金鑰以解鎖功能！");
+      return;
+    }
     fileInputRef.current?.click();
   };
 
@@ -133,10 +163,103 @@ export function MainView({
         <div className="flex flex-col gap-3">
           <button 
             onClick={triggerFileInput}
-            className="w-full h-16 flex items-center justify-center gap-3 relative overflow-hidden sticker-btn btn-import-pattern font-bold rounded-[16px]"
+            className={`w-full h-16 flex items-center justify-center gap-3 relative overflow-hidden sticker-btn btn-import-pattern font-bold rounded-[16px] ${
+              (!serverHasApiKey && !customApiKey.trim()) ? "opacity-90 saturate-50" : ""
+            }`}
           >
-            <span className="relative z-10 text-lg font-black tracking-widest">圖片匯入</span>
+            <span className="relative z-10 text-lg font-black tracking-widest">
+              {(!serverHasApiKey && !customApiKey.trim()) ? "🔒 圖片匯入 (需設定金鑰)" : "✨ 圖片匯入"}
+            </span>
           </button>
+
+          {/* Dynamic API Key requirement UI */}
+          {(!serverHasApiKey && !customApiKey.trim()) ? (
+            <div className="bg-[#FAF8F5] border-2 border-dashed border-[#C57B83] rounded-xl p-3 text-xs text-[#5C524E]">
+              <p className="font-extrabold text-[#C57B83] mb-1 flex items-center gap-1">
+                🔑 需要 Google Gemini API Key
+              </p>
+              <p className="text-[10px] text-[#8C807A] leading-relaxed mb-1.5">
+                此功能核心由 Google Gemini AI 驅動。請貼上您的 API Key：
+              </p>
+              {keyAlertMsg && (
+                <p className="text-[10px] text-[#C57B83] font-bold mb-1.5 animate-pulse">{keyAlertMsg}</p>
+              )}
+              <div className="flex gap-2">
+                <input
+                  type="password"
+                  placeholder="請輸入 API Key (AIzaSy...)"
+                  value={apiKeyInput}
+                  onChange={(e) => setApiKeyInput(e.target.value)}
+                  className="flex-1 bg-white border border-[#92837B] rounded-lg px-2.5 py-1 text-xs font-mono outline-none focus:border-[#C57B83]"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!apiKeyInput.trim()) {
+                      setKeyAlertMsg("請先輸入有效的金鑰！");
+                      return;
+                    }
+                    onSaveApiKey(apiKeyInput.trim());
+                    setKeyAlertMsg("");
+                  }}
+                  className="bg-[#C57B83] hover:bg-[#B36971] text-white font-extrabold px-3 py-1 rounded-lg border-2 border-[#92837B] cursor-pointer text-[11px]"
+                >
+                  啟用
+                </button>
+              </div>
+              <p className="text-[9px] text-[#8C807A] mt-1 text-center">
+                金鑰僅儲存於您本地瀏覽器 (localStorage)。
+              </p>
+            </div>
+          ) : (
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setShowKeySettings(!showKeySettings)}
+                className="text-[10px] text-[#8C807A] hover:text-[#C57B83] font-bold underline decoration-dotted cursor-pointer"
+              >
+                {serverHasApiKey && !customApiKey.trim() ? "🟢 已啟用系統預設金鑰 (可點擊自訂) ⚙️" : "🟢 已啟用自訂 API 授權金鑰 (可修改) ⚙️"}
+              </button>
+              
+              {showKeySettings && (
+                <div className="bg-[#FAF8F5] border-2 border-dashed border-[#92837B] rounded-xl p-3 text-xs text-[#5C524E] mt-2 text-left animate-fadeIn">
+                  <p className="font-extrabold mb-1.5">🔑 變更或清除您的 Gemini API Key</p>
+                  <div className="flex gap-1.5">
+                    <input
+                      type="password"
+                      placeholder={serverHasApiKey ? "系統金鑰已存在，在此輸入可覆寫它" : "請貼上您的 API Key"}
+                      value={apiKeyInput}
+                      onChange={(e) => setApiKeyInput(e.target.value)}
+                      className="flex-1 bg-white border border-[#92837B] rounded-lg px-2 py-1 text-xs font-mono outline-none focus:border-[#C57B83]"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onSaveApiKey(apiKeyInput.trim());
+                        setShowKeySettings(false);
+                      }}
+                      className="bg-[#C57B83] hover:bg-[#B36971] text-white font-extrabold px-2 py-1 rounded-lg border-2 border-[#92837B] cursor-pointer text-[10px]"
+                    >
+                      儲存
+                    </button>
+                    {customApiKey && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onSaveApiKey("");
+                          setApiKeyInput("");
+                          setShowKeySettings(false);
+                        }}
+                        className="bg-white hover:bg-gray-100 text-[#8C807A] font-extrabold px-1.5 py-1 rounded-lg border border-[#92837B] cursor-pointer text-[10px]"
+                      >
+                        清除
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
           
           <button 
             onClick={onStartReview}

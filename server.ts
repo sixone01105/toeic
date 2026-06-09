@@ -13,35 +13,33 @@ const PORT = 3000;
 app.use(express.json({ limit: "15mb" }));
 app.use(express.urlencoded({ limit: "15mb", extended: true }));
 
-// Lazy initializer for GoogleGenAI to ensure it doesn't crash on boot if key is missing
-let aiClient: GoogleGenAI | null = null;
-function getAiClient(): GoogleGenAI {
-  if (!aiClient) {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      throw new Error("GEMINI_API_KEY environment variable is required but missing.");
-    }
-    aiClient = new GoogleGenAI({
-      apiKey,
-      httpOptions: {
-        headers: {
-          "User-Agent": "aistudio-build",
-        }
-      }
-    });
+// Lazy initializer or generator for GoogleGenAI to handle custom or environment dynamic keys
+function getAiClient(customApiKey?: string): GoogleGenAI {
+  const apiKey = customApiKey || process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("API Key is missing. Please enter your Google Gemini API Key.");
   }
-  return aiClient;
+  return new GoogleGenAI({
+    apiKey,
+    httpOptions: {
+      headers: {
+        "User-Agent": "aistudio-build",
+      }
+    }
+  });
 }
 
 // API endpoint for server-side Gemini OCR with automatic schema and tags
 app.post("/api/ocr", async (req, res) => {
   try {
-    const { imageBase64 } = req.body;
+    const { imageBase64, customApiKey } = req.body;
+    const clientKey = req.headers["x-gemini-api-key"] as string || customApiKey;
+
     if (!imageBase64) {
       return res.status(400).json({ error: "Missing imageBase64 data in request body." });
     }
 
-    const ai = getAiClient();
+    const ai = getAiClient(clientKey);
     
     const systemPromptText = `You are an expert multilingual OCR and typography interpreter. 
 Analyze the image provided and accurately extract vocabulary words, their parts-of-speech (pos), and traditional Chinese translations (trans).
@@ -137,6 +135,11 @@ All extracted fields must be structured into a standard JSON Array.`;
     console.error("Gemini OCR Server Route Error:", error);
     return res.status(500).json({ error: error?.message || "An internal error occurred during server-side OCR processing." });
   }
+});
+
+// Config and API key check endpoint
+app.get("/api/config", (req, res) => {
+  res.json({ hasApiKey: !!process.env.GEMINI_API_KEY });
 });
 
 // Healthy connection check endpoint

@@ -31,6 +31,10 @@ export default function App() {
   const [currentView, setCurrentView] = useState<CurrentView>("mainView");
   const [vocabList, setVocabList] = useState<VocabItem[]>([]);
   
+  // Custom API configuration states
+  const [customApiKey, setCustomApiKey] = useState<string>(() => localStorage.getItem("vocab_gemini_api_key") || "");
+  const [serverHasApiKey, setServerHasApiKey] = useState<boolean>(false);
+  
   // Safe navigation interceptor state
   const [isReviewFinished, setIsReviewFinished] = useState(true);
 
@@ -94,6 +98,19 @@ export default function App() {
     if (localOffset) {
       setSimulatedTimeOffset(parseInt(localOffset, 10));
     }
+
+    // Check backend config availability
+    fetch("/api/config")
+      .then((res) => {
+        if (res.ok) return res.json();
+        throw new Error();
+      })
+      .then((data) => {
+        setServerHasApiKey(!!data.hasApiKey);
+      })
+      .catch(() => {
+        setServerHasApiKey(false);
+      });
   }, []);
 
   // Save to localStorage when changed
@@ -211,10 +228,16 @@ export default function App() {
           setLoadingProgressText(`連線重試中 (第 ${attempt} 次/共 4 次)...`);
         }
 
+        const headers: Record<string, string> = { "Content-Type": "application/json" };
+        const savedCustomKey = localStorage.getItem("vocab_gemini_api_key") || customApiKey || "";
+        if (savedCustomKey) {
+          headers["x-gemini-api-key"] = savedCustomKey;
+        }
+
         const response = await fetch(apiEndpoint, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ imageBase64 })
+          headers,
+          body: JSON.stringify({ imageBase64, customApiKey: savedCustomKey })
         });
 
         if (response.ok) {
@@ -435,6 +458,13 @@ export default function App() {
             onOpenReader={(filter) => {
               setReaderInitialFilter(filter || "all");
               setIsReaderOpen(true);
+            }}
+            customApiKey={customApiKey}
+            serverHasApiKey={serverHasApiKey}
+            onSaveApiKey={(key) => {
+              setCustomApiKey(key);
+              localStorage.setItem("vocab_gemini_api_key", key);
+              showToast("🔑 API Key 儲存成功！");
             }}
           />
         )}
