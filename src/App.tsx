@@ -66,7 +66,7 @@ export default function App() {
       setConfirmModal({
         isOpen: true,
         title: "確定離開？ ⚠️",
-        message: "確定要離開?複習會中斷唷!",
+        message: "複習會中斷唷!",
         onConfirm: () => {
           setConfirmModal(prev => ({ ...prev, isOpen: false }));
           setIsReviewFinished(true);
