@@ -88,7 +88,7 @@ export function CalendarModal({ isOpen, onClose, currentDate }: CalendarModalPro
         </div>
 
         <div className="text-[10px] text-[#8C807A] mt-4 text-center font-bold">
-          * 點擊主畫面「快轉模擬 1 天」即可觀看日期流逝與單字到期。
+          * 點擊日曆方格可瀏覽過往與未來規畫。
         </div>
       </div>
     </div>

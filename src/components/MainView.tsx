@@ -3,7 +3,6 @@ import { VocabItem } from "../types";
 
 interface MainViewProps {
   vocabList: VocabItem[];
-  onSimulateTimeFly: () => void;
   onStartReview: () => void;
   onSwitchView: (view: "mainView" | "manageView" | "reviewView") => void;
   onOpenCalendar: () => void;
@@ -16,7 +15,6 @@ interface MainViewProps {
 
 export function MainView({
   vocabList,
-  onSimulateTimeFly,
   onStartReview,
   onSwitchView,
   onOpenCalendar,
@@ -309,16 +307,6 @@ export function MainView({
           <span className="text-xl font-black text-[#97B2C4] mt-1">
             {totalCount}
           </span>
-        </button>
-      </div>
-
-      {/* Spaced repetition time-fly simulates */}
-      <div className="mt-4 flex justify-between">
-        <button 
-          onClick={onSimulateTimeFly}
-          className="sticker-btn bg-[#FEF3C7] text-[#92400E] border-2 border-[#92837B] text-[10px] font-bold py-2 px-3 rounded-xl cursor-pointer w-full text-center"
-        >
-          ⏰ 模擬快轉 1 天 (+1 Day SRS)
         </button>
       </div>
 

@@ -37,9 +37,6 @@ export default function App() {
   
   // Safe navigation interceptor state
   const [isReviewFinished, setIsReviewFinished] = useState(true);
-
-  // Spaced repetition time-fly offset (in milliseconds)
-  const [simulatedTimeOffset, setSimulatedTimeOffset] = useState<number>(0);
   
   // Overlays
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -94,11 +91,6 @@ export default function App() {
       setVocabList(DEFAULT_VOCAB);
     }
 
-    const localOffset = localStorage.getItem("vocab_master_time_offset");
-    if (localOffset) {
-      setSimulatedTimeOffset(parseInt(localOffset, 10));
-    }
-
     // Check backend config availability
     fetch("/api/config")
       .then((res) => {
@@ -117,14 +109,6 @@ export default function App() {
   const saveVocabList = (updated: VocabItem[]) => {
     setVocabList(updated);
     localStorage.setItem("vocab_master_list", JSON.stringify(updated));
-  };
-
-  const handleSimulateTimeFly = () => {
-    const oneDayInMs = 24 * 60 * 60 * 1000;
-    const newOffset = simulatedTimeOffset + oneDayInMs;
-    setSimulatedTimeOffset(newOffset);
-    localStorage.setItem("vocab_master_time_offset", newOffset.toString());
-    showToast("⏰ 時光飛逝 1 天！已更新今日 SRS 排程到期狀況！");
   };
 
   const showToast = (message: string) => {
@@ -146,7 +130,7 @@ export default function App() {
     const updated = vocabList.map((item) => {
       if (item.id === id) {
         let newLevel = item.level;
-        let newNextReviewDate = Date.now() + simulatedTimeOffset;
+        let newNextReviewDate = Date.now();
 
         if (remembered) {
           newLevel = Math.min(item.level + 1, 5);
@@ -174,7 +158,7 @@ export default function App() {
   const [reviewPool, setReviewPool] = useState<VocabItem[]>([]);
 
   const handleStartReview = () => {
-    const cutoffTime = Date.now() + simulatedTimeOffset;
+    const cutoffTime = Date.now();
     
     // Items are due if nextReviewDate is in the past, and has not been logged as marked mastered
     const dueVocab = vocabList.filter(item => {
@@ -296,7 +280,7 @@ export default function App() {
     const duplicates: string[] = [];
 
     // Format current date with offset as MMDD (e.g., 0611 for 2026/06/11)
-    const d = new Date(Date.now() + simulatedTimeOffset);
+    const d = new Date();
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const date = String(d.getDate()).padStart(2, '0');
     const defaultDateTag = `${month}${date}`;
@@ -326,7 +310,7 @@ export default function App() {
             category: categoryLabel,
             mastered: false,
             level: 0,
-            nextReviewDate: Date.now() + simulatedTimeOffset
+            nextReviewDate: Date.now()
           });
           addedCount++;
         }
@@ -376,7 +360,7 @@ export default function App() {
       category: category || "未分類",
       mastered: false,
       level: 0,
-      nextReviewDate: Date.now() + simulatedTimeOffset
+      nextReviewDate: Date.now()
     };
 
     saveVocabList([newItem, ...vocabList]);
@@ -457,7 +441,6 @@ export default function App() {
         {currentView === "mainView" && (
           <MainView 
             vocabList={vocabList}
-            onSimulateTimeFly={handleSimulateTimeFly}
             onStartReview={handleStartReview}
             onSwitchView={navigateViewSafely}
             onOpenCalendar={() => setIsCalendarOpen(true)}
@@ -586,7 +569,7 @@ export default function App() {
       <CalendarModal 
         isOpen={isCalendarOpen} 
         onClose={() => setIsCalendarOpen(false)} 
-        currentDate={new Date(Date.now() + simulatedTimeOffset)}
+        currentDate={new Date()}
       />
 
       <CustomConfirmModal 
