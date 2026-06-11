@@ -306,9 +306,7 @@ export default function App() {
       const posFormatted = item.pos ? (item.pos.endsWith(".") ? item.pos : item.pos + ".") : "n.";
       const transCleaned = item.trans.trim();
       // Set default category label to today's date tag (e.g. "0611")
-      const categoryLabel = item.category && item.category.trim() !== "未分類" && item.category.trim() !== "一般"
-        ? item.category.trim()
-        : defaultDateTag;
+      const categoryLabel = defaultDateTag;
 
       // Verify duplication
       const exists = vocabList.some(v => v.word.toLowerCase() === wordFormatted);
