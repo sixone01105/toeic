@@ -256,8 +256,13 @@ export function ReviewView({ reviewPool, onCompleteReview, onExitReview, onFinis
                 </div>
               </div>
             ) : (
-              <div className="text-[36px] font-black text-[#5C524E] lowercase leading-snug break-all max-w-[260px]">
-                {activeCard.word}
+              <div className="flex flex-col items-center justify-center">
+                <div className="text-[36px] font-black text-[#5C524E] lowercase leading-snug break-all max-w-[260px]">
+                  {activeCard.word}
+                </div>
+                <div className="text-[11px] font-bold text-[#8C807A]/80 tracking-wider mt-2.5 animate-pulse">
+                  👆 點擊翻面
+                </div>
               </div>
             )}
           </div>

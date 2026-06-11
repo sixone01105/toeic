@@ -295,11 +295,20 @@ export default function App() {
     const currentList = [...vocabList];
     const duplicates: string[] = [];
 
+    // Format current date with offset as MMDD (e.g., 0611 for 2026/06/11)
+    const d = new Date(Date.now() + simulatedTimeOffset);
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const date = String(d.getDate()).padStart(2, '0');
+    const defaultDateTag = `${month}${date}`;
+
     items.forEach((item) => {
       const wordFormatted = item.word.toLowerCase().trim();
       const posFormatted = item.pos ? (item.pos.endsWith(".") ? item.pos : item.pos + ".") : "n.";
       const transCleaned = item.trans.trim();
-      const categoryLabel = item.category ? item.category.trim() : "未分類";
+      // Set default category label to today's date tag (e.g. "0611")
+      const categoryLabel = item.category && item.category.trim() !== "未分類" && item.category.trim() !== "一般"
+        ? item.category.trim()
+        : defaultDateTag;
 
       // Verify duplication
       const exists = vocabList.some(v => v.word.toLowerCase() === wordFormatted);
